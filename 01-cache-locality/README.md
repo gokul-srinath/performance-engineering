@@ -21,7 +21,7 @@ Requires a C++17 compiler and a POSIX-compatible system (the program uses
 `01-cache-locality` directory:
 
 ```sh
-g++ -O2 -std=c++17 src/memory_access.cpp -o src/memory_access
+g++ -O2 -fno-tree-vectorize -std=c++17 src/memory_access.cpp -o src/memory_access
 ```
 
 ## Run
@@ -35,7 +35,16 @@ Choose one mode:
 ```
 
 After setup, the program prints its PID and waits for Enter before starting
-the benchmark. This gives time to attach a profiler such as Linux `perf`.
+the benchmark. From another terminal, attach Linux `perf` using the PID
+printed by the program (replace `<PID>` with that number):
+
+```sh
+perf stat -p <PID> -e cycles,instructions,cache-references,cache-misses
+```
+
+Once `perf` is attached, press Enter in the benchmark terminal to start the
+measurement. `-fno-tree-vectorize` keeps compiler auto-vectorization disabled
+so the benchmark focuses on the memory access patterns.
 
 The results depend on the machine, compiler, optimization flags, and system
 load. Compare modes on the same machine and under similar conditions; timings
